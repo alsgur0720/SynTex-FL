@@ -1,0 +1,50 @@
+#!/bin/bash
+
+
+deepspeed llava/train/train_mem.py \
+    --deepspeed ./scripts/zero2.json \
+    --lora_enable True \
+    --model_name_or_path ./checkpoints/$MODEL_VERSION \
+    --version $PROMPT_VERSION \
+    --data_path_1 ./data/client_1/json/llava_instruct.json \
+    --image_folder_1 /client_1/images \
+    --data_path_2 ./data/client_2/json/llava_instruct.json  \
+    --image_folder_2 /client_2/images \
+    --data_path_3 ./data/client_3/json/llava_instruct.json  \
+    --image_folder_3 /client_3/images \
+    --data_path_4 ./data/client_4/json/llava_instruct.json  \
+    --image_folder_4 /client_4/images \
+    --data_path_5 ./data/client_5/json/llava_instruct.json  \
+    --image_folder_5 /client_5/images \
+    --data_path_6 ./data/client_6/json/llava_instruct.json  \
+    --image_folder_6 /client_6/images \
+    --data_path_7 ./data/client_7/json/llava_instruct.json  \
+    --image_folder_7 /client_7/images \
+    --data_path_8 ./data/client_8/json/llava_instruct.json  \
+    --image_folder_8 /client_8/images \
+    --vision_tower openai/clip-vit-large-patch14 \
+    --pretrain_mm_mlp_adapter ./checkpoints/llava-$MODEL_VERSION-pretrain/mm_projector.bin \
+    --mm_vision_select_layer -2 \
+    --mm_use_im_start_end False \
+    --mm_use_im_patch_token False \
+    --bf16 True \
+    --output_dir ./checkpoints/llava-$MODEL_VERSION-finetune_lora \
+    --num_train_epochs 1 \
+    --per_device_train_batch_size 16 \
+    --per_device_eval_batch_size 4 \
+    --gradient_accumulation_steps 1 \
+    --evaluation_strategy "no" \
+    --save_strategy "steps" \
+    --save_steps 50000 \
+    --save_total_limit 1 \
+    --learning_rate 2e-5 \
+    --weight_decay 0. \
+    --warmup_ratio 0.03 \
+    --lr_scheduler_type "cosine" \
+    --logging_steps 1 \
+    --tf32 True \
+    --model_max_length 2048 \
+    --gradient_checkpointing True \
+    --lazy_preprocess True \
+    --dataloader_num_workers 4 \
+    --report_to wandb
